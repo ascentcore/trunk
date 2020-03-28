@@ -1,10 +1,4 @@
-/**
-- population size: 100
-- active worker percent: 0.6 
-- comercial areas: 10
- */
-
-const CANVAS_WIDTH = 500
+const CANVAS_WIDTH = 450
 const GRAPH_HEIGHT = 50
 const PADDING = 10
 const CANVAS_HEIGHT = CANVAS_WIDTH + GRAPH_HEIGHT + PADDING
