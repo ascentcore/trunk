@@ -21,7 +21,7 @@ export const DEFAULTS = {
         startManifest: 2,
         manifestUpTo: 6,
         spreadProbability: 0.04,
-        recoveryTime: 10,
+        recoveryTime: 4,
         mortality: 0.09,
         reinfectProbability: 0.001
     }
@@ -48,7 +48,6 @@ function renderCell(ctx, loc, resolution) {
             break;
     }
     
-    console.log(x * resolution - resolution / 2, y * resolution - resolution / 2, resolution, resolution)
 
     ctx.fillRect(x * resolution - resolution / 2, y * resolution - resolution / 2, resolution, resolution);
     ctx.strokeStyle = 'rgba(0,0,0,0.3)';
@@ -72,7 +71,6 @@ export function initializePopulation(settings) {
 
     const { mapSize } = config;
 
-    console.log(config.mapSize)
 
     let deaths = 0;
     let infected = 0;
@@ -354,6 +352,7 @@ export function initializePopulation(settings) {
                     }
 
                     if (ind.recover == 0) {
+                        
                         ind.infected = false;
                         ind.wasInfected = true;
                         infected--;

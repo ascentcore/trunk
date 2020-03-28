@@ -31,7 +31,6 @@ function appendControls(obj, keys, id) {
     keys.forEach(key => {
         let finalResult = dictionary[key];
         if (!finalResult) {
-            console.log(key)
             let result = key.replace(/([A-Z])/g, " $1");
             finalResult = result.charAt(0).toUpperCase() + result.slice(1);
         }
