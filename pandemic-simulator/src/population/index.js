@@ -193,7 +193,7 @@ export function initializePopulation(settings) {
     const offscreenCanvas = document.createElement('canvas');
     offscreenCanvas.width = canvas.width;
     offscreenCanvas.height = canvas.height;
-    
+
     housing.forEach(loc => {
         renderCell(offscreenCanvas.getContext('2d'), loc, resolution)
     })
@@ -221,9 +221,11 @@ export function initializePopulation(settings) {
                 }
 
                 const xp = x * resolution - halfX + ind.offsetX
-                const yp = y * resolution - halfY + ind.offsetY                
+                const yp = y * resolution - halfY + ind.offsetY
                 ctx.beginPath();
-                ctx.fillRect(xp - 1, yp - 1, 2, 2);
+                const size = infected ? -2 : -1;
+                const doubleSize = infected ? -4 : -2;
+                ctx.fillRect(xp - size, yp - size, doubleSize, doubleSize);
                 ctx.stroke()
 
                 // if (infected && timeUntilManifestation > 0) {
@@ -397,8 +399,10 @@ export function initializePopulation(settings) {
     function day() {
         individuals.forEach(ind => {
             ind.social = false;
-            ind.currentTarget = ind.assignedHome;
-            ind.returnTime = ind.workReturnTime;
+            if (ind.currentTarget !== hospital) {
+                ind.currentTarget = ind.assignedHome;
+                ind.returnTime = ind.workReturnTime;
+            }
         });
     }
 
