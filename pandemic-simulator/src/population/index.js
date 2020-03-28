@@ -4,10 +4,10 @@
 - comercial areas: 10
  */
 
-const CANVAS_WIDTH = 300
+const CANVAS_WIDTH = 500
 const GRAPH_HEIGHT = 50
 const PADDING = 10
-const CANVAS_HEIGHT = 300 + GRAPH_HEIGHT + PADDING
+const CANVAS_HEIGHT = CANVAS_WIDTH + GRAPH_HEIGHT + PADDING
 
 export const DEFAULTS = {
     populationSize: 500,
@@ -18,9 +18,9 @@ export const DEFAULTS = {
     socialProbability: 0.0002,
     mapSize: [30, 30],
     virus: {
-        startManifest: 2,
+        startManifest: 1,
         manifestUpTo: 6,
-        spreadProbability: 0.04,
+        spreadProbability: 0.01,
         recoveryTime: 4,
         mortality: 0.09,
         reinfectProbability: 0.001
@@ -62,7 +62,7 @@ export function initializePopulation(settings) {
     const { populationSize, workerPercent, commercialAreas, socialAreas, virus, visitProbability, socialProbability } = config;
     const { startManifest, manifestUpTo, spreadProbability, mortality, recoveryTime, reinfectProbability } = virus;
 
-    const lat = Math.floor(Math.sqrt(populationSize)) + commercialAreas + socialAreas;
+    const lat = Math.max(Math.floor(Math.sqrt(populationSize / 2 + commercialAreas + socialAreas)), 30);
 
 
     config.mapSize = [lat, lat];
@@ -82,6 +82,7 @@ export function initializePopulation(settings) {
         infected: new Array(CANVAS_WIDTH).fill(0),
         hospitalized: new Array(CANVAS_WIDTH).fill(0),
         dead: new Array(CANVAS_WIDTH).fill(0),
+        days: new Array(CANVAS_WIDTH).fill(0),
     }
 
     function updateStat(statKey, counter) {
@@ -174,6 +175,8 @@ export function initializePopulation(settings) {
         assignedHome.size += 1
         Object.assign(individual, {
             location: 0,
+            offsetX: 0,
+            offsetY: 0,
             x: assignedHome.x,
             y: assignedHome.y,
             currentTarget: assignedHome,
@@ -185,11 +188,10 @@ export function initializePopulation(settings) {
     }
 
     for (let i = 0; i < populationSize * workerPercent; i++) {
-        individuals[i].destination = commercial[Math.floor(Math.random() * commercial.length - 1)];
+        individuals[i].destination = commercial[Math.floor(Math.random() * commercial.length)];
         individuals[i].destinationTime = (Math.floor(Math.random() * 4) + 6) * 60 + Math.floor(Math.random() * 30)
-        individuals[i].returnTime = individuals[i].destinationTime + 8 * 60;
+        individuals[i].workReturnTime = individuals[i].returnTime = individuals[i].destinationTime + 8 * 60;
     }
-
 
     const housing = [...commercial, ...residential, ...social, hospital];
 
@@ -208,27 +210,24 @@ export function initializePopulation(settings) {
             const { x, y, infected, dead, timeUntilManifestation } = ind;
 
             if (!dead) {
-                ctx.fillStyle = 'rgba(25,25,25,1)';
 
                 if (infected) {
                     ctx.fillStyle = 'rgb(255,0,0)';
+                } else {
+                    ctx.fillStyle = 'rgba(25,25,25,1)';
                 }
 
-                const xp = x * resolution - halfX + Math.floor(Math.random() * halfX * 2)
-                const yp = y * resolution - halfY + Math.floor(Math.random() * halfX * 2)
+                const xp = x * resolution - halfX + ind.offsetX
+                const yp = y * resolution - halfY + ind.offsetY
                 ctx.beginPath();
-                ctx.fillRect(xp, yp, 3, 3);
+                ctx.fillRect(xp - 1, yp - 1, 2, 2);
                 ctx.stroke()
 
-                if (infected) {
-                    if (timeUntilManifestation < 0) {
-                        ctx.strokeStyle = `rgb(255,0,0,1)`
-                    } else {
-                        ctx.strokeStyle = `rgb(240, 121, 17)`
-                    }
+                if (infected && timeUntilManifestation > 0) {
+                    ctx.strokeStyle = `rgb(255,0,0,1)`
                     ctx.beginPath();
                     ctx.strokeWidth = 2
-                    ctx.arc(xp, yp, 4, 0, 2 * Math.PI);
+                    ctx.arc(xp, yp, 3, 0, 2 * Math.PI);
                     ctx.stroke();
                 }
             }
@@ -236,8 +235,9 @@ export function initializePopulation(settings) {
 
 
         renderGraph(ctx, stats.infected, 'rgba(255,125,40, 0.3)', 'Infected: ')
-        renderGraph(ctx, stats.hospitalized, 'rgba(255,0,0, 0.3)', 'Confirmed Cases: ')
+        renderGraph(ctx, stats.hospitalized, 'rgba(255,0,0, 0.3)', 'Hospitalised: ')
         renderGraph(ctx, stats.dead, 'rgba(0,0,0, 0.3)', 'Fatalities: ')
+        renderGraph(ctx, stats.days, 'rgba(0,0,0, 0.5)', '')
     }
 
     function renderGraph(ctx, stat, color, prefix) {
@@ -269,8 +269,7 @@ export function initializePopulation(settings) {
             infected++;
             individual.infected = true;
             individual.timeUntilManifestation =
-                startManifest +
-                Math.floor(Math.random() * (manifestUpTo - startManifest))
+                (startManifest + Math.floor(Math.random() * (manifestUpTo)))
                 * 24 * 60;
             individual.willDie = Math.random() < mortality;
             individual.recover = (recoveryTime + Math.floor(recoveryTime * Math.random() * 0.3)) * 24 * 60;
@@ -279,7 +278,9 @@ export function initializePopulation(settings) {
 
     infect(individuals[0])
 
+
     function tick(minute) {
+
 
         individuals.forEach(ind => {
             const { currentTarget, destination, destinationTime, returnTime, assignedHome } = ind;
@@ -287,15 +288,20 @@ export function initializePopulation(settings) {
             if (!ind.dead) {
 
                 if (ind.currentTarget != hospital && !isolation) {
-                    if (destination && destinationTime === minute && currentTarget == assignedHome) {
-                        ind.currentTarget = destination;
-                    } else if (returnTime === minute && currentTarget != assignedHome) {
+
+                    if (destinationTime === minute) {
+                        if (destination && ind.currentTarget === assignedHome && destinationTime === minute) {
+                            ind.currentTarget = destination;
+                        }
+
+                    } else if (ind.currentTarget !== assignedHome && returnTime === minute) {
                         ind.currentTarget = assignedHome;
-                    } else if (!ind.social) {
+                    } else if (!ind.social && ind.currentTarget === assignedHome) {
                         if (Math.random() < visitProbability) {
                             const visit = residential[Math.floor(residential.length * Math.random())];
-                            ind.social = true
+
                             if (visit != assignedHome) {
+                                ind.social = true
                                 ind.returnTime = minute + Math.floor(Math.random() * 3) * 60
                                 ind.currentTarget = visit;
                             }
@@ -366,6 +372,13 @@ export function initializePopulation(settings) {
 
                 ind.x += Math.sign(ind.currentTarget.x - ind.x)
                 ind.y += Math.sign(ind.currentTarget.y - ind.y)
+
+                if (Math.random() < 0.1) {
+                    ind.offsetX = Math.floor(Math.random() * resolution / 2) - 1;
+                }
+                if (Math.random() < 0.1) {
+                    ind.offsetY = Math.floor(Math.random() * resolution / 2) - 1;
+                }
             }
         })
 
@@ -373,20 +386,23 @@ export function initializePopulation(settings) {
             updateStat('infected', infected)
             updateStat('dead', deaths)
             updateStat('hospitalized', hospitalized)
+            updateStat('days', minute === 0 ? populationSize : 0)
         }
 
-
-
-        render(minute);
     }
 
     function day() {
-        individuals.forEach(ind => ind.social = false);
+        individuals.forEach(ind => {
+            ind.social = false;
+            ind.currentTarget = ind.assignedHome;
+            ind.returnTime = ind.workReturnTime;
+        });
     }
 
 
     return {
         wrapper,
+        render,
         tick,
         day,
         getLegend

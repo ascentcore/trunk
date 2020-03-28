@@ -29,7 +29,7 @@ selectors.slower.onclick = e => {
 const dictionary = {
     "startManifest": "Manifestation Start (day)",
     "manifestUpTo": "Manifestation Delay (days)",
-    "recoveryTime": "Recovery Time (days)" 
+    "recoveryTime": "Recovery Time (days)"
 }
 
 function appendControls(obj, keys, id) {
@@ -70,6 +70,7 @@ function addPopulation() {
     const delBtn = document.createElement('button')
     delBtn.className = 'waves-effect waves-light btn-small red';
     delBtn.innerText = 'Remove'
+    delBtn.style = 'float: right;'
     delBtn.onclick = () => {
         const idx = populations.indexOf(pop)
         populations.splice(idx, 1);
@@ -83,28 +84,31 @@ addPopulation();
 
 selectors.addsimulation.onclick = e => addPopulation();
 
-let speed = 2
+let speed = 1
 let currentIndex = speed;
-let minute = 8 * 60;
+let minute = 4 * 60;
 
-function tick() {
-    window.requestAnimationFrame(() => {
-        currentIndex--;
-        if (currentIndex < 1 && speed !== -1) {
-            currentIndex = speed;
-            populations.forEach(pop => pop.tick(minute))
-            minute++;
-            if (minute++ > 60 * 24) {
-                minute = 0;
-                populations.forEach(pop => pop.day())
-            }
-            const hour = Math.floor(minute / 60)
-            const prefix = hour > 7 && hour < 19 ? '☀️' : '🌙'
-            time.innerHTML = `Time of day ${prefix}: ${('' + hour).padStart(2, '0')}:${('' + Math.floor(minute % 60)).padStart(2, '0')}`
-
+window.setInterval(() => {
+    currentIndex--;
+    if (currentIndex < 1 && speed !== -1) {
+        currentIndex = speed;
+        populations.forEach(pop => pop.tick(minute))
+        if (minute++ > 60 * 24) {
+            minute = 0;
+            populations.forEach(pop => pop.day())
         }
-        tick()
+        const hour = Math.floor(minute / 60)
+        const prefix = hour > 7 && hour < 19 ? '☀️' : '🌙'
+        time.innerHTML = `Time of day ${prefix}: ${('' + hour).padStart(2, '0')}:${('' + Math.floor(minute % 60)).padStart(2, '0')}`
+    }
+}, 1)
+
+function render() {
+    window.requestAnimationFrame( () => {
+        populations.forEach(pop => pop.render())
+        render();
     })
 }
 
-tick();
+render();
+
