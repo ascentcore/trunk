@@ -190,13 +190,22 @@ export function initializePopulation(settings) {
     const housing = [...commercial, ...residential, ...social, hospital];
 
 
+    const offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = canvas.width;
+    offscreenCanvas.height = canvas.height;
+    
+    housing.forEach(loc => {
+        renderCell(offscreenCanvas.getContext('2d'), loc, resolution)
+    })
+
 
     function render(minute) {
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-        housing.forEach(loc => {
-            renderCell(ctx, loc, resolution)
-        })
+        // housing.forEach(loc => {
+        //     renderCell(ctx, loc, resolution)
+        // })
+        ctx.drawImage(offscreenCanvas, 0, 0);
 
         const halfX = resolution / 6;
         const halfY = resolution / 6;
@@ -212,18 +221,18 @@ export function initializePopulation(settings) {
                 }
 
                 const xp = x * resolution - halfX + ind.offsetX
-                const yp = y * resolution - halfY + ind.offsetY
+                const yp = y * resolution - halfY + ind.offsetY                
                 ctx.beginPath();
                 ctx.fillRect(xp - 1, yp - 1, 2, 2);
                 ctx.stroke()
 
-                if (infected && timeUntilManifestation > 0) {
-                    ctx.strokeStyle = `rgb(255,0,0,1)`
-                    ctx.beginPath();
-                    ctx.strokeWidth = 2
-                    ctx.arc(xp, yp, 3, 0, 2 * Math.PI);
-                    ctx.stroke();
-                }
+                // if (infected && timeUntilManifestation > 0) {
+                //     ctx.strokeStyle = `rgb(255,0,0,1)`
+                //     ctx.beginPath();
+                //     ctx.strokeWidth = 2
+                //     ctx.arc(xp, yp, 3, 0, 2 * Math.PI);
+                //     ctx.stroke();
+                // }
             }
         });
 
