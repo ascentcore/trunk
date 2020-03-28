@@ -28,7 +28,33 @@ export const DEFAULTS = {
 }
 
 
+function renderCell(ctx, loc, resolution) {
+    const { x, y, type } = loc;
+    switch (type) {
+        case 0:
+            ctx.fillStyle = 'rgba(0,255,0,0.4)';
+            break;
+        case 1:
+            ctx.fillStyle = 'rgba(0,0,255,0.4)'
+            break;
+        case 2:
+            ctx.fillStyle = 'rgba(240,124,64,0.4)'
+            break;
+        case 3:
+            ctx.fillStyle = 'rgba(64,64,64,0.4)'
+            break;
+        case 4:
+            ctx.fillStyle = 'rgba(255,64,255,0.4)'
+            break;
+    }
+    
+    console.log(x * resolution - resolution / 2, y * resolution - resolution / 2, resolution, resolution)
 
+    ctx.fillRect(x * resolution - resolution / 2, y * resolution - resolution / 2, resolution, resolution);
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.strokeRect(x * resolution - resolution / 2, y * resolution - resolution / 2, resolution, resolution);
+    ctx.stroke()
+}
 
 export function initializePopulation(settings) {
 
@@ -36,14 +62,14 @@ export function initializePopulation(settings) {
 
     const { populationSize, workerPercent, commercialAreas, socialAreas, virus, visitProbability, socialProbability } = config;
     const { startManifest, manifestUpTo, spreadProbability, mortality, recoveryTime, reinfectProbability } = virus;
-    
+
     const lat = Math.floor(Math.sqrt(populationSize)) + commercialAreas + socialAreas;
-    
+
 
     config.mapSize = [lat, lat];
 
 
-    
+
     const { mapSize } = config;
 
     console.log(config.mapSize)
@@ -168,32 +194,13 @@ export function initializePopulation(settings) {
 
     const housing = [...commercial, ...residential, ...social, hospital];
 
+
+
     function render(minute) {
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
         housing.forEach(loc => {
-            const { x, y, type } = loc;
-            switch (type) {
-                case 0:
-                    ctx.fillStyle = 'rgba(0,255,0,0.4)';
-                    break;
-                case 1:
-                    ctx.fillStyle = 'rgba(0,0,255,0.4)'
-                    break;
-                case 2:
-                    ctx.fillStyle = 'rgba(240,124,64,0.4)'
-                    break;
-                case 3:
-                    ctx.fillStyle = 'rgba(64,64,64,0.4)'
-                    break;
-                case 4:
-                    ctx.fillStyle = 'rgba(255,64,255,0.4)'
-                    break;
-            }
-            ctx.fillRect(x * resolution - resolution / 2, y * resolution - resolution / 2, resolution, resolution);
-            ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-            ctx.strokeRect(x * resolution - resolution / 2, y * resolution - resolution / 2, resolution, resolution);
-            ctx.stroke()
+            renderCell(ctx, loc, resolution)
         })
 
         const halfX = resolution / 6;
@@ -377,11 +384,39 @@ export function initializePopulation(settings) {
         individuals.forEach(ind => ind.social = false);
     }
 
+    
     return {
         wrapper,
         tick,
-        day
+        day,
+        getLegend
     }
 
+
+}
+
+export function getLegend() {
+    const cvs = document.createElement('canvas')
+    const ctx = cvs.getContext('2d');
+
+    cvs.width = 200;
+    cvs.height = 45;
+
+    ctx.fillText("Legend", 5, 8);
+    ctx.fillText("House", 20, 21);
+    ctx.fillText("Work/Commercial", 20, 38);
+
+    ctx.fillText("Hospital", 135, 21);
+    ctx.fillText("Social Area", 135, 38);
+
+    renderCell(ctx, { x: 1, y: 2, type: 0 }, 9)
+    renderCell(ctx, { x: 1, y: 4, type: 1 }, 9)
+
+    renderCell(ctx, { x: 14, y: 2, type: 2 }, 9)
+    renderCell(ctx, { x: 14, y: 4, type: 4 }, 9)
+
+    
+
+    return cvs;
 
 }

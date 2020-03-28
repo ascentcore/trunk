@@ -1,9 +1,11 @@
-import { DEFAULTS, initializePopulation } from './population';
+import { DEFAULTS, initializePopulation, getLegend } from './population';
 
-const selectors = ['speed', 'slower', 'faster', 'stop', 'setup', 'virus-setup', 'simulations', 'addsimulation'].reduce((memo, key) => {
+const selectors = ['speed', 'slower', 'faster', 'stop', 'setup', 'virus-setup', 'simulations', 'addsimulation', 'header'].reduce((memo, key) => {
     memo[key] = document.querySelector(`#${key}`)
     return memo;
 }, {});
+
+selectors.header.appendChild(getLegend())
 
 selectors.stop.onclick = e => {
     speed = speed === -1 ? 1 : -1;
