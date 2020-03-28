@@ -5,6 +5,10 @@ const selectors = ['speed', 'slower', 'faster', 'stop', 'setup', 'virus-setup', 
     return memo;
 }, {});
 
+const time = document.createElement('span');
+time.style = "display: inline-block; width: 200px; font-size: 14px; font-family: monospace;"
+
+selectors.header.appendChild(time)
 selectors.header.appendChild(getLegend())
 
 selectors.stop.onclick = e => {
@@ -23,8 +27,9 @@ selectors.slower.onclick = e => {
 }
 
 const dictionary = {
-    "startManifest": "Manifestation Start",
-    "manifestUpTo": "Manifestation Delay"
+    "startManifest": "Manifestation Start (day)",
+    "manifestUpTo": "Manifestation Delay (days)",
+    "recoveryTime": "Recovery Time (days)" 
 }
 
 function appendControls(obj, keys, id) {
@@ -93,6 +98,9 @@ function tick() {
                 minute = 0;
                 populations.forEach(pop => pop.day())
             }
+            const hour = Math.floor(minute / 60)
+            const prefix = hour > 7 && hour < 19 ? '☀️' : '🌙'
+            time.innerHTML = `Time of day ${prefix}: ${('' + hour).padStart(2, '0')}:${('' + Math.floor(minute % 60)).padStart(2, '0')}`
 
         }
         tick()

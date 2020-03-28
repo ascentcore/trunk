@@ -47,7 +47,7 @@ function renderCell(ctx, loc, resolution) {
             ctx.fillStyle = 'rgba(255,64,255,0.4)'
             break;
     }
-    
+
 
     ctx.fillRect(x * resolution - resolution / 2, y * resolution - resolution / 2, resolution, resolution);
     ctx.strokeStyle = 'rgba(0,0,0,0.3)';
@@ -101,7 +101,8 @@ export function initializePopulation(settings) {
     infectButton.className = 'waves-effect waves-light btn-small';
 
     infectButton.onclick = () => {
-        infect(individuals.find(ind => !ind.infected));
+        const healthy = individuals.filter(ind => !ind.infected)
+        infect(healthy[Math.floor(Math.random() * healthy.length)]);
     }
 
     const isolationWrapper = document.createElement('div')
@@ -352,7 +353,7 @@ export function initializePopulation(settings) {
                     }
 
                     if (ind.recover == 0) {
-                        
+
                         ind.infected = false;
                         ind.wasInfected = true;
                         infected--;
@@ -383,7 +384,7 @@ export function initializePopulation(settings) {
         individuals.forEach(ind => ind.social = false);
     }
 
-    
+
     return {
         wrapper,
         tick,
@@ -414,7 +415,7 @@ export function getLegend() {
     renderCell(ctx, { x: 14, y: 2, type: 2 }, 9)
     renderCell(ctx, { x: 14, y: 4, type: 4 }, 9)
 
-    
+
 
     return cvs;
 
