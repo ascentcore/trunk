@@ -17,4 +17,4 @@ tensorflow==1.8.0
 tensorflow-hub==0.1.0
 tensorflowjs==0.5.2
 termcolor==1.1.0
-Werkzeug==0.14.1
+Werkzeug==0.15.3
