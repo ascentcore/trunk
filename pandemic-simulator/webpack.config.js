@@ -43,6 +43,10 @@ const config = {
         exclude: /(node_modules|bower_components)/
       },
       {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
         test: /\.(gif|png|jpe?g|svg)$/i,
         use: [
           "file-loader",

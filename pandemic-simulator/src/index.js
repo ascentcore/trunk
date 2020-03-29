@@ -1,4 +1,6 @@
 import { DEFAULTS, initializePopulation } from './population';
+import './styles/spectre.min.css';
+import './styles/spectre-icons.min.css';
 
 const selectors = ['speed', 'slower', 'faster', 'stop', 'setup', 'virus-setup', 'simulations', 'addsimulation', 'header', 'simulation-card'].reduce((memo, key) => {
     memo[key] = document.querySelector(`#${key}`)
