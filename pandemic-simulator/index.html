@@ -6,11 +6,9 @@
 </head>
 
 <body>
-
-
   <div class="container">
     <div class="columns">
-      <div class="column col-3 col-xs-12 col-sm-6 col-md-4">
+      <div class="column col-2 col-sm-12 col-lg-4 col-xl-3">
         <div class="card">
           <div class="card-header">
             <div class="card-title h5">Virus Setup</div>
@@ -60,59 +58,63 @@
 
       </div>
 
-      <div class="column col-9 col-xs-12 col-sm-6 col-md-6 ">
+      <div class="column col-10 col-sm-12 col-lg-8  col-xl-9">
         <div class="card">
           <div class="card-header" id="header">
-            Simulation
+            <span class="h4">Simulation: </span>
             <button class="btn btn-small" id="slower">Slower</button>
             <button class="btn btn-small" id="stop">Pause</button>
             <button class="btn btn-small" id="faster">Faster</button>
+
+            <a href="/" class="btn btn-small btn-error" style="float: right">Back To Homepage</a>
           </div>
           <div class="card-body" id="simulations">
 
           </div>
         </div>
+        <div class="card">
+          <div class="card-header" id="header">
+            <h5>Pandemic Simulator</h5>
+            <p>The simulator was develped in order to better understand the social distancing and isolation effects on
+              the
+              development of the pandemic</p>
+          </div>
+          <div class="card-body columns">
+            <div class="column col-6 col-sm-12">
+              <p>Initially the virus configuration was setup to simulate COVID-19 behavior but it can be configured as
+                follows:</p>
+              <ul>
+                <li><b>Manifestation start (day)</b> - the average start day when the virus manifests - patient taken to
+                  hospital</li>
+                <li><b>Manifestation delay (days)</b> - the maximum amount of days that the manifestation can be delayed
+                </li>
+                <li<b>Spread Probability</b> - probability to pass the virus to a healthy neighboring person on contact
+                  </li>
+                  <li><b>Recovery Time</b> - the average time needed for a patient to recover in hospital</li>
+                  <li><b>Mortality</b> - fatality rate of the virus</li>
+                  <li><b>Reinfect Probability</b>- probability of a person to get reinfectted after getting cured</li>
+              </ul>
+            </div>
+            <div class="column col-6 col-sm-12">
+              <p>Environment setup and social interactions:</p>
+              <ul>
+                <li><b>Population Size</b> - number of individuals in the population</li>
+                <li><b>Worker percent</b> - the number of individuals that are actively working (work day will start at
+                  6:00 +/- 4h and lasts for 8 hours</li>
+                <li<b>Commercial Areas</b> - number of places for people to work in</li>
+                  <li><b>Social Areas</b> - number of places for people to go and socialize</li>
+                  <li><b>Visit probability</b> - the probability of an individual to go and visit another one in its
+                    house
+                  </li>
+                  <li><b>Social Probability</b>- the probability of an individual to go and socialize in a public space
+                  </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <!--
-  <div class="row">
-    <div class="col s6 m4 l3">
-
-      <div class="card ">
-        <div class="card-content ">
-          <span class="card-title">Virus Setup</span>
-          <div class="row" id="virus-setup"></div>
-        </div>
-      </div>
-      <div class="card ">
-        <div class="card-content ">
-          <span class="card-title">Simulation Setup</span>
-          <div class="row" id="setup"></div>
-        </div>
-        <div class="card-action">
-          <button class="waves-effect waves-light btn" id="addsimulation">Add Simulation</button>
-        </div>
-      </div>
-    </div>
-    <div class="col s6 m8 l9 card">
-      <div class="card-content">
-
-        <span class="card-title" id="header">
-          Simulation
-          <button class="waves-effect waves-light btn-small" id="slower">Slower</button>
-          <button class="waves-effect waves-light btn-small" id="stop">Pause</button>
-          <button class="waves-effect waves-light btn-small" id="faster">Faster</button>
-        </span>
-        <div id="simulations">
-
-        </div>
-
-      </div>
-    </div>
-
-  </div>
--->
 </body>
 
 </html>
