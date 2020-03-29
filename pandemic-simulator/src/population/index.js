@@ -384,8 +384,8 @@ export function initializePopulation(settings) {
 
 
 
-                ind.x += Math.random() < 0.6 ? Math.sign(ind.currentTarget.x - ind.x) : Math.floor(-1 + Math.random() * 2);
-                ind.y += Math.random() < 0.6 ? Math.sign(ind.currentTarget.y - ind.y) : Math.floor(-1 + Math.random() * 2);
+                ind.x += Math.random() < 0.95 ? Math.floor(Math.sign(ind.currentTarget.x - ind.x) * resolution / 6) : Math.floor(-(resolution / 4) + Math.random() * (resolution / 2));
+                ind.y += Math.random() < 0.95 ? Math.floor(Math.sign(ind.currentTarget.y - ind.y) * resolution / 6) : Math.floor(-(resolution / 4) + Math.random() * (resolution / 2));
             }
         })
 
