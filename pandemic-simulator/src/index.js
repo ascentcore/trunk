@@ -1,15 +1,14 @@
-import { DEFAULTS, initializePopulation, getLegend } from './population';
+import { DEFAULTS, initializePopulation } from './population';
 
-const selectors = ['speed', 'slower', 'faster', 'stop', 'setup', 'virus-setup', 'simulations', 'addsimulation', 'header'].reduce((memo, key) => {
+const selectors = ['speed', 'slower', 'faster', 'stop', 'setup', 'virus-setup', 'simulations', 'addsimulation', 'header', 'simulation-card'].reduce((memo, key) => {
     memo[key] = document.querySelector(`#${key}`)
     return memo;
 }, {});
 
 const time = document.createElement('span');
-time.style = "display: inline-block; width: 200px; font-size: 14px; font-family: monospace;"
+time.className = "chip"
 
 selectors.header.appendChild(time)
-selectors.header.appendChild(getLegend())
 
 selectors.stop.onclick = e => {
     speed = speed === -1 ? 1 : -1;
@@ -32,7 +31,7 @@ const dictionary = {
     "recoveryTime": "Recovery Time (days)"
 }
 
-function appendControls(obj, keys, id) {
+function appendControls(obj, keys, id, suffix = 'col-6') {
     keys.forEach(key => {
         let finalResult = dictionary[key];
         if (!finalResult) {
@@ -40,18 +39,24 @@ function appendControls(obj, keys, id) {
             finalResult = result.charAt(0).toUpperCase() + result.slice(1);
         }
 
-        const html = `<div class="input-field col s6">
-          <input value="${obj[key]}" id="${key}" type="number" min="0">
-          <label class="active" for="${key}">${finalResult}</label>
-        </div>`
+        const html = `<div class="form-group">
+            <label class="form-label" for="${key}">${finalResult}</label>
+            <input class="form-input" value="${obj[key]}" id="${key}" type="${typeof (obj[key]) === 'string' ? 'text' : 'number'}" min="0">        
+          </div>
+        `
         const wrapper = document.createElement('div');
+        wrapper.className = 'column ' + suffix;
         wrapper.innerHTML = html;
         selectors[id].appendChild(wrapper);
         const inputBox = wrapper.querySelector('input')
         inputBox.onchange = evt => {
             const { value } = evt.target;
-            const numVal = parseFloat(value);
-            obj[key] = numVal;
+            if (typeof (obj[key]) == 'string') {
+                obj[key] = value;
+            } else {
+                const numVal = parseFloat(value);
+                obj[key] = numVal;
+            }
         }
     })
 
@@ -60,7 +65,7 @@ function appendControls(obj, keys, id) {
 const currentSetup = Object.assign({}, DEFAULTS);
 appendControls(currentSetup, ['populationSize', 'workerPercent', 'commercialAreas', 'socialAreas', 'visitProbability', 'socialProbability'], 'setup');
 appendControls(currentSetup.virus, ['startManifest', 'manifestUpTo', 'spreadProbability', 'recoveryTime', 'mortality', 'reinfectProbability'], 'virus-setup');
-
+appendControls(currentSetup, ['name'], 'simulation-card', 'col-12');
 
 const populations = []
 function addPopulation() {
@@ -68,8 +73,8 @@ function addPopulation() {
     selectors.simulations.appendChild(pop.wrapper)
     const action = pop.wrapper.querySelector('.sim-control')
     const delBtn = document.createElement('button')
-    delBtn.className = 'waves-effect waves-light btn-small red';
-    delBtn.innerText = 'Remove'
+    delBtn.className = 'btn btn-small btn-error';
+    delBtn.innerHTML = '<i class="icon icon-shutdown"></i> Remove Simulation'
     delBtn.style = 'float: right;'
     delBtn.onclick = () => {
         const idx = populations.indexOf(pop)
@@ -99,12 +104,13 @@ window.setInterval(() => {
         }
         const hour = Math.floor(minute / 60)
         const prefix = hour > 7 && hour < 19 ? '☀️' : '🌙'
-        time.innerHTML = `Time of day ${prefix}: ${('' + hour).padStart(2, '0')}:${('' + Math.floor(minute % 60)).padStart(2, '0')}`
+
+        time.innerHTML = `<figure class="avatar avatar-sm" style="text-align: center; padding-top: 3px" >${prefix}</figure>Time: ${('' + hour).padStart(2, '0')}:${('' + Math.floor(minute % 60)).padStart(2, '0')}`
     }
 }, 1)
 
 function render() {
-    window.requestAnimationFrame( () => {
+    window.requestAnimationFrame(() => {
         populations.forEach(pop => pop.render())
         render();
     })

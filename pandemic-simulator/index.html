@@ -1,14 +1,84 @@
 <html>
 
 <head>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <link rel="stylesheet" href="http://localhost:3000/dist/spectre.min.css">
+  <link rel="stylesheet" href="http://localhost:3000/dist/spectre-icons.min.css">
 
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 </head>
 
 <body>
+
+
+  <div class="container">
+    <div class="columns">
+      <div class="column col-3 col-xs-12 col-sm-6 col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title h5">Virus Setup</div>
+          </div>
+          <div class="card-body columns" id="virus-setup">
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title h5">Population Setup</div>
+          </div>
+          <div class="card-body columns" id="setup">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body columns" id="simulation-card">
+          </div>
+          <div class="card-footer">
+            <button class="btn btn-primary" id="addsimulation"><i class="icon icon-plus"></i> Add Simulation</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title h5">Legend</div>
+          </div>
+          <div class="card-body" id="legend">
+            <div class="chip">
+              <figure class="avatar avatar-sm" style="border: 1px solid #000; background-color: rgba(0,255,0,0.4);">
+              </figure>House
+            </div>
+            <div class="chip">
+              <figure class="avatar avatar-sm" style="border: 1px solid #000; background-color: rgba(0,0,255,0.4);">
+              </figure>Commercial/Work
+            </div>
+            <div class="chip">
+              <figure class="avatar avatar-sm" style="border: 1px solid #000; background-color: rgba(240,124,64,0.4);">
+              </figure>Social Areas
+            </div>
+            <div class="chip">
+              <figure class="avatar avatar-sm" style="border: 1px solid #000; background-color: rgba(255,64,255,0.4);">
+              </figure>Hospital
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="column col-9 col-xs-12 col-sm-6 col-md-6 ">
+        <div class="card">
+          <div class="card-header" id="header">
+            Simulation
+            <button class="btn btn-small" id="slower">Slower</button>
+            <button class="btn btn-small" id="stop">Pause</button>
+            <button class="btn btn-small" id="faster">Faster</button>
+          </div>
+          <div class="card-body" id="simulations">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--
   <div class="row">
     <div class="col s6 m4 l3">
 
@@ -45,7 +115,7 @@
     </div>
 
   </div>
-
+-->
 </body>
 
 </html>

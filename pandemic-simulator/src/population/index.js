@@ -1,20 +1,21 @@
-const CANVAS_WIDTH = 450
+const CANVAS_WIDTH = 350
 const GRAPH_HEIGHT = 50
 const PADDING = 10
 const CANVAS_HEIGHT = CANVAS_WIDTH + GRAPH_HEIGHT + PADDING
 
 export const DEFAULTS = {
-    populationSize: 500,
+    name: 'Unnamed Simulation',
+    populationSize: 1000,
     workerPercent: 0.7,
-    commercialAreas: 6,
-    socialAreas: 5,
+    commercialAreas: 20,
+    socialAreas: 30,
     visitProbability: 0.0001,
     socialProbability: 0.0002,
     mapSize: [30, 30],
     virus: {
-        startManifest: 1,
+        startManifest: 2,
         manifestUpTo: 6,
-        spreadProbability: 0.01,
+        spreadProbability: 0.015,
         recoveryTime: 4,
         mortality: 0.09,
         reinfectProbability: 0.001
@@ -43,9 +44,9 @@ function renderCell(ctx, loc, resolution) {
     }
 
 
-    ctx.fillRect(x * resolution - resolution / 2, y * resolution - resolution / 2, resolution, resolution);
+    ctx.fillRect(x - resolution / 2, y - resolution / 2, resolution, resolution);
     ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-    ctx.strokeRect(x * resolution - resolution / 2, y * resolution - resolution / 2, resolution, resolution);
+    ctx.strokeRect(x - resolution / 2, y - resolution / 2, resolution, resolution);
     ctx.stroke()
 }
 
@@ -53,7 +54,7 @@ export function initializePopulation(settings) {
 
     const config = Object.assign({}, DEFAULTS, settings);
 
-    const { populationSize, workerPercent, commercialAreas, socialAreas, virus, visitProbability, socialProbability } = config;
+    const { name, populationSize, workerPercent, commercialAreas, socialAreas, virus, visitProbability, socialProbability } = config;
     const { startManifest, manifestUpTo, spreadProbability, mortality, recoveryTime, reinfectProbability } = virus;
 
     const lat = Math.max(Math.floor(Math.sqrt(populationSize / 2 + commercialAreas + socialAreas)), 30);
@@ -86,14 +87,14 @@ export function initializePopulation(settings) {
 
     const wrapper = document.createElement('span')
     wrapper.style = "display: inline-block; padding: 10px; border: 1px solid #000; margin: 5px;";
-
+    wrapper.innerHTML = `<h5 style="text-align: center">${name}</h5>`
     const canvas = document.createElement('canvas');
     wrapper.appendChild(canvas);
 
 
     const infectButton = document.createElement('button')
     infectButton.innerText = 'Infect';
-    infectButton.className = 'waves-effect waves-light btn-small';
+    infectButton.className = 'btn btn-small btn-error';
 
     infectButton.onclick = () => {
         const healthy = individuals.filter(ind => !ind.infected)
@@ -103,10 +104,13 @@ export function initializePopulation(settings) {
     const isolationWrapper = document.createElement('div')
     isolationWrapper.className = 'sim-control';
     isolationWrapper.style = 'margin-top: 10px';
-    isolationWrapper.innerHTML = `<label>
-        <input type="checkbox"  />
-        <span>Force Isolation</span>
-    </label>`;
+    isolationWrapper.innerHTML = `
+    <div class="form-group" style="display: inline-block">
+        <label class="form-switch">
+            <input type="checkbox"  />
+            <i class="form-icon"></i> Force Isolation
+        </label>
+    </div>`;
 
     isolationWrapper.appendChild(infectButton)
 
@@ -138,7 +142,7 @@ export function initializePopulation(settings) {
             const key = `${x}-${y}`;
 
             if (!map[key]) {
-                spot = Object.assign({}, props, { x, y });
+                spot = Object.assign({}, props, { x: x * resolution, y: y * resolution });
                 map[key] = spot;
             }
         }
@@ -220,8 +224,10 @@ export function initializePopulation(settings) {
                     ctx.fillStyle = 'rgba(25,25,25,1)';
                 }
 
-                const xp = x * resolution - halfX + ind.offsetX
-                const yp = y * resolution - halfY + ind.offsetY
+                const xp = x
+                // * resolution - halfX + ind.offsetX
+                const yp = y
+                // * resolution - halfY + ind.offsetY
                 ctx.beginPath();
                 const size = infected ? -2 : -1;
                 const doubleSize = infected ? -4 : -2;
@@ -239,13 +245,13 @@ export function initializePopulation(settings) {
         });
 
 
-        renderGraph(ctx, stats.infected, 'rgba(255,125,40, 0.3)', 'Infected: ')
-        renderGraph(ctx, stats.hospitalized, 'rgba(255,0,0, 0.3)', 'Hospitalised: ')
-        renderGraph(ctx, stats.dead, 'rgba(0,0,0, 0.3)', 'Fatalities: ')
-        renderGraph(ctx, stats.days, 'rgba(0,0,0, 0.5)', '')
+        renderGraph(ctx, stats.infected, 'rgba(255,125,40, 0.3)', 'Infected: ', 0)
+        renderGraph(ctx, stats.hospitalized, 'rgba(255,0,0, 0.3)', 'Hospitalised: ', 50)
+        renderGraph(ctx, stats.dead, 'rgba(0,0,0, 0.3)', 'Fatalities: ', 120)
+        renderGraph(ctx, stats.days, 'rgba(0,0,0, 0.5)')
     }
 
-    function renderGraph(ctx, stat, color, prefix) {
+    function renderGraph(ctx, stat, color, prefix, offset = 0) {
         ctx.strokeStyle = color
 
 
@@ -264,9 +270,11 @@ export function initializePopulation(settings) {
         ctx.lineTo(CANVAS_WIDTH, CANVAS_HEIGHT - lastY);
         ctx.stroke();
 
-        ctx.fillStyle = '#000';
-        ctx.font = "10px Lato";
-        ctx.fillText(`${prefix}${lastStat}`, 0, CANVAS_HEIGHT - lastY - 2);
+        if (prefix) {
+            ctx.fillStyle = '#000';
+            ctx.font = "10px Lato";
+            ctx.fillText(`${prefix}${lastStat}`, offset, CANVAS_HEIGHT - lastY - 2);
+        }
     }
 
     function infect(individual) {
@@ -288,7 +296,7 @@ export function initializePopulation(settings) {
 
 
         individuals.forEach(ind => {
-            const { currentTarget, destination, destinationTime, returnTime, assignedHome } = ind;
+            const { destination, destinationTime, returnTime, assignedHome } = ind;
 
             if (!ind.dead) {
 
@@ -333,7 +341,8 @@ export function initializePopulation(settings) {
                                 }
                                 const xd = (ind.x - neigh.x) * (ind.x - neigh.x);
                                 const yd = (ind.y - neigh.y) * (ind.y - neigh.y);
-                                return Math.sqrt(xd + yd) < 2;
+                                const res = Math.sqrt(xd + yd);
+                                return res < 4;
                             });
 
 
@@ -375,15 +384,8 @@ export function initializePopulation(settings) {
 
 
 
-                ind.x += Math.sign(ind.currentTarget.x - ind.x)
-                ind.y += Math.sign(ind.currentTarget.y - ind.y)
-
-                if (Math.random() < 0.1) {
-                    ind.offsetX = Math.floor(Math.random() * resolution / 2) - 1;
-                }
-                if (Math.random() < 0.1) {
-                    ind.offsetY = Math.floor(Math.random() * resolution / 2) - 1;
-                }
+                ind.x += Math.random() < 0.6 ? Math.sign(ind.currentTarget.x - ind.x) : Math.floor(-1 + Math.random() * 2);
+                ind.y += Math.random() < 0.6 ? Math.sign(ind.currentTarget.y - ind.y) : Math.floor(-1 + Math.random() * 2);
             }
         })
 
@@ -411,35 +413,8 @@ export function initializePopulation(settings) {
         wrapper,
         render,
         tick,
-        day,
-        getLegend
+        day
     }
-
-
 }
 
-export function getLegend() {
-    const cvs = document.createElement('canvas')
-    const ctx = cvs.getContext('2d');
 
-    cvs.width = 200;
-    cvs.height = 45;
-
-    ctx.fillText("Legend", 5, 8);
-    ctx.fillText("House", 20, 21);
-    ctx.fillText("Work/Commercial", 20, 38);
-
-    ctx.fillText("Hospital", 135, 21);
-    ctx.fillText("Social Area", 135, 38);
-
-    renderCell(ctx, { x: 1, y: 2, type: 0 }, 9)
-    renderCell(ctx, { x: 1, y: 4, type: 1 }, 9)
-
-    renderCell(ctx, { x: 14, y: 2, type: 2 }, 9)
-    renderCell(ctx, { x: 14, y: 4, type: 4 }, 9)
-
-
-
-    return cvs;
-
-}
