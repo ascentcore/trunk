@@ -4,22 +4,20 @@ const PADDING = 10
 const CANVAS_HEIGHT = CANVAS_WIDTH + GRAPH_HEIGHT + PADDING
 
 export const DEFAULTS = {
-    name: 'Unnamed Simulation',
+    name: 'Default Simulation',
     populationSize: 1000,
     workerPercent: 0.7,
     commercialAreas: 20,
     socialAreas: 30,
-    visitProbability: 0.0001,
-    socialProbability: 0.0002,
+    visitProbability: 0.0002,
+    socialProbability: 0.0004,
     mapSize: [30, 30],
-    virus: {
-        startManifest: 2,
-        manifestUpTo: 6,
-        spreadProbability: 0.015,
-        recoveryTime: 4,
-        mortality: 0.09,
-        reinfectProbability: 0.001
-    }
+    startManifest: 2,
+    manifestUpTo: 6,
+    spreadProbability: 0.015,
+    recoveryTime: 4,
+    mortality: 0.09,
+    reinfectProbability: 0.001
 }
 
 
@@ -54,8 +52,8 @@ export function initializePopulation(settings) {
 
     const config = Object.assign({}, DEFAULTS, settings);
 
-    const { name, populationSize, workerPercent, commercialAreas, socialAreas, virus, visitProbability, socialProbability } = config;
-    const { startManifest, manifestUpTo, spreadProbability, mortality, recoveryTime, reinfectProbability } = virus;
+    const { name, populationSize, workerPercent, commercialAreas, socialAreas, visitProbability, socialProbability } = config;
+    const { startManifest, manifestUpTo, spreadProbability, mortality, recoveryTime, reinfectProbability } = config;
 
     const lat = Math.max(Math.floor(Math.sqrt(populationSize / 2 + commercialAreas + socialAreas)), 30);
 
@@ -137,8 +135,8 @@ export function initializePopulation(settings) {
         let spot;
 
         while (!spot) {
-            const x = 1 + Math.floor(Math.random() * (mapSize[0] - 1))
-            const y = 1 + Math.floor(Math.random() * (mapSize[1] - 1))
+            const x = Math.floor(1 + Math.floor(Math.random() * (mapSize[0] - 1)))
+            const y = Math.floor(1 + Math.floor(Math.random() * (mapSize[1] - 1)))
             const key = `${x}-${y}`;
 
             if (!map[key]) {
@@ -211,8 +209,6 @@ export function initializePopulation(settings) {
         // })
         ctx.drawImage(offscreenCanvas, 0, 0);
 
-        const halfX = resolution / 6;
-        const halfY = resolution / 6;
         individuals.forEach(ind => {
             const { x, y, infected, dead, timeUntilManifestation } = ind;
 
@@ -295,7 +291,7 @@ export function initializePopulation(settings) {
     function tick(minute) {
 
 
-        individuals.forEach(ind => {
+        individuals.forEach((ind, index) => {
             const { destination, destinationTime, returnTime, assignedHome } = ind;
 
             if (!ind.dead) {
@@ -384,8 +380,12 @@ export function initializePopulation(settings) {
 
 
 
-                ind.x += Math.random() < 0.95 ? Math.floor(Math.sign(ind.currentTarget.x - ind.x) * resolution / 6) : Math.floor(-(resolution / 4) + Math.random() * (resolution / 2));
-                ind.y += Math.random() < 0.95 ? Math.floor(Math.sign(ind.currentTarget.y - ind.y) * resolution / 6) : Math.floor(-(resolution / 4) + Math.random() * (resolution / 2));
+                const xDiff = ind.currentTarget.x - ind.x;
+                const xModifier = Math.max(Math.min(resolution, xDiff), 1)
+                const yDiff = ind.currentTarget.y - ind.y;
+                const yModifier = Math.max(Math.min(resolution, yDiff), 1)
+                ind.x += Math.random() < 0.95 ? Math.floor(Math.sign(xDiff) * xModifier / 2) : Math.floor(-xModifier / 2 + Math.random() * xModifier)
+                ind.y += Math.random() < 0.95 ? Math.floor(Math.sign(yDiff) * yModifier / 2) : Math.floor(-yModifier / 2 + Math.random() * yModifier)                
             }
         })
 

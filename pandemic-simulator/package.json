@@ -12,14 +12,9 @@
   "author": "Cornel Stefanache",
   "license": "MIT",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.3",
-    "babel-loader": "^7.1.4",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-transform-es2015-destructuring": "^6.23.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
+    "@babel/core": "^7.7.7",
+    "@babel/node": "^7.7.7",
+    "@babel/preset-env": "^7.7.7",
     "css-loader": "^3.4.2",
     "csv-parser": "^2.2.0",
     "csv-writer": "^1.2.0",
@@ -41,5 +36,7 @@
     "webpack-dev-server": "^3.1.4",
     "yargs": "^11.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "babel-loader": "^8.1.0"
+  }
 }
