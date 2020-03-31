@@ -1,59 +1,65 @@
-import { DEFAULTS, initializePopulation } from './population';
+import { DEFAULTS, LEGEND_ITEMS, initializePopulation } from './population';
 import './styles/spectre.min.css';
 import './styles/spectre-icons.min.css';
 
+// Scenario templates
+const templates = [
+    { "name": "Default", "value": { ...DEFAULTS } },
+    { "name": "Large Size City", "value": { "name": "Large Size City", "populationSize": 10000, "commercialAreas": 400, "socialAreas": 500 } },
+    { "name": "Medium Size City", "value": { "name": "Medium Size City", "populationSize": 5000, "commercialAreas": 300, "socialAreas": 350 } },
+    { "name": "Small Size City", "value": { "name": "Small Size City", "populationSize": 1000, "commercialAreas": 60, "socialAreas": 80 } },
+    { "name": "Work From Home", "value": { "name": "Work From Home", "commercialAreas": 0, "workerPercent": 0 } },
+    { "name": "Isolation: Visits Disalowed / Shopping Allowed", "value": { "name": "Visits Disalowed / Shopping Allowed", "visitProbability": 0, "socialProbability": DEFAULTS.socialProbability, "workerPercent": 0 } },
+    { "name": "Isolation: Visits Allowed / Shopping Disalowed", "value": { "name": "Visits Allowed / Shopping Disalowed", "visitProbability": DEFAULTS.visitProbability, "socialProbability": 0, "workerPercent": 0 } },
+]
 
-let frameskip = 0;
-let currentFrame = 0;
-let overwrite = false;
+// Population to simulate
 const populations = []
 
-
-const selectors = ['speed', 'slower', 'faster', 'stop', 'frameskip', 'fsinc', 'fsdec', 'setup', 'virus-setup', 'simulations', 'addsimulation', 'header', 'simulation-card'].reduce((memo, key) => {
-    memo[key] = document.querySelector(`#${key}`)
-    return memo;
-}, {});
-
-selectors.fsinc.onclick = () => {
-    frameskip++;
-    selectors.frameskip.innerHTML = `Frameskip: ${frameskip}`;
-}
-
-selectors.fsdec.onclick = () => {
-    frameskip--;
-    if (frameskip < 0) {
-        frameskip = 0;
-    }
-    selectors.frameskip.innerHTML = `Frameskip: ${frameskip}`;
-}
-
-
-const time = document.createElement('span');
-time.className = "chip"
-
-selectors.header.appendChild(time)
-
-selectors.stop.onclick = e => {
-    speed = speed === -1 ? 1 : -1;
-    selectors.stop.innerHTML = speed !== -1 ? 'Pause' : 'Start';
-}
-
-selectors.faster.onclick = e => {
-    if (speed > 0) {
-        speed--
-    }
-}
-
-selectors.slower.onclick = e => {
-    speed++
-}
-
+// Label Dictionary
 const dictionary = {
     "startManifest": "Manifestation Start (day)",
     "manifestUpTo": "Manifestation Delay (days)",
     "recoveryTime": "Recovery Time (days)"
 }
 
+let frameskip = 0;          // current frameskip
+let currentFrame = 0;       // framecounter - decreased by frameskip (render on 0)
+let overwrite = false;      // template overwrite flag
+let speed = 1               // current speed - 1: fastest
+let currentIndex = speed;   // current index
+let minute = 5 * 60;        // Initialize time at 5:00 AM in the morning 
+
+
+// Programatically created elements
+const time = document.createElement('span');
+time.className = "chip"
+
+// List of ID selectors from he HTML - this is used for DOM manipulation
+const selectors = ['speed', 'slower', 'faster', 'stop', 'frameskip', 'fsinc', 'fsdec', 'setup', 'virus-setup', 'simulations', 'addsimulation', 'header', 'simulation-card', 'legend'].reduce((memo, key) => {
+    memo[key] = document.querySelector(`#${key}`)
+    return memo;
+}, {});
+
+LEGEND_ITEMS.forEach(legendItem => {
+    selectors.legend.innerHTML += `
+        <div class="chip">
+            <figure class="avatar avatar-sm" style="border: 1px solid #000; background-color: ${legendItem.color}"></figure>${legendItem.name}
+        </div>
+    `
+})
+
+// Append children to DOM
+selectors.header.appendChild(time)
+
+
+/**
+ * Append input control to DOM
+ * @param {*} obj - ref to take / store information at [key] from/into
+ * @param {*} keys - list of keys to render controls for
+ * @param {*} id - DOM id reference for parent
+ * @param {*} suffix - input class name (col-6 - half the screen)
+ */
 function appendControls(obj, keys, id, suffix = 'col-6') {
     keys.forEach(key => {
         let finalResult = dictionary[key];
@@ -85,23 +91,20 @@ function appendControls(obj, keys, id, suffix = 'col-6') {
 
 }
 
+
+
+
+// Prepare initial simulatin setup object
 const currentSetup = Object.assign({}, DEFAULTS);
 
+// Virus Setup Controls
 appendControls(currentSetup, ['startManifest', 'manifestUpTo', 'spreadProbability', 'recoveryTime', 'mortality', 'reinfectProbability'], 'virus-setup');
+
+// Population Setup Controls
 appendControls(currentSetup, ['populationSize', 'workerPercent', 'commercialAreas', 'socialAreas', 'visitProbability', 'socialProbability'], 'setup');
+
+// Simulation controls
 appendControls(currentSetup, ['name'], 'simulation-card', 'col-12');
-
-const templates = [
-    { "name": "Default", "value": { ...DEFAULTS } },
-    { "name": "Large Size City", "value": { "name": "Large Size City", "populationSize": 10000, "commercialAreas": 400, "socialAreas": 500 } },
-    { "name": "Medium Size City", "value": { "name": "Medium Size City", "populationSize": 5000, "commercialAreas": 300, "socialAreas": 350 } },
-    { "name": "Small Size City", "value": { "name": "Small Size City", "populationSize": 1000, "commercialAreas": 60, "socialAreas": 80 } },
-    { "name": "Work From Home", "value": { "name": "Work From Home", "commercialAreas": 0, "workerPercent": 0 } },
-    { "name": "Isolation: Visits Disalowed / Shopping Allowed", "value": { "name": "Visits Disalowed / Shopping Allowed", "visitProbability": 0, "socialProbability": DEFAULTS.socialProbability, "workerPercent": 0 } },
-    { "name": "Isolation: Visits Allowed / Shopping Disalowed", "value": { "name": "Visits Allowed / Shopping Disalowed", "visitProbability": DEFAULTS.visitProbability, "socialProbability": 0, "workerPercent": 0 } },
-]
-
-
 const html = `<div class="column col-12">
     <div class="form-group">
         <label class="form-label" for="templates">Select from template</label>
@@ -120,8 +123,62 @@ const html = `<div class="column col-12">
 
 const simulationCard = document.querySelector('#simulation-card');
 simulationCard.innerHTML += html;
+
 const templateSelector = simulationCard.querySelector('#templates');
 const overwriteSelector = simulationCard.querySelector('#overwrite');
+
+
+/**
+ * Add population
+ */
+function addPopulation() {
+    const pop = initializePopulation(currentSetup);
+    selectors.simulations.appendChild(pop.wrapper)
+    const action = pop.wrapper.querySelector('.sim-control')
+    const delBtn = document.createElement('button')
+    delBtn.className = 'btn btn-small btn-error';
+    delBtn.innerHTML = '<i class="icon icon-shutdown"></i> Remove Simulation'
+    delBtn.style = 'float: right;'
+    delBtn.onclick = () => {
+        const idx = populations.indexOf(pop)
+        populations.splice(idx, 1);
+        selectors.simulations.removeChild(pop.wrapper);
+    }
+    action.appendChild(delBtn)
+    populations.push(pop)
+}
+
+
+// ---------[ Action Listeners ]--------- //
+
+selectors.fsinc.onclick = () => {
+    frameskip++;
+    selectors.frameskip.innerHTML = `Frameskip: ${frameskip}`;
+}
+
+selectors.fsdec.onclick = () => {
+    frameskip--;
+    if (frameskip < 0) {
+        frameskip = 0;
+    }
+    selectors.frameskip.innerHTML = `Frameskip: ${frameskip}`;
+}
+
+selectors.stop.onclick = e => {
+    speed = speed === -1 ? 1 : -1;
+    selectors.stop.innerHTML = speed !== -1 ? 'Pause' : 'Start';
+}
+
+selectors.faster.onclick = e => {
+    if (speed > 0) {
+        speed--
+    }
+}
+
+selectors.slower.onclick = e => {
+    speed++
+}
+
 templateSelector.onchange = evt => {
     const { value } = evt.target;
 
@@ -145,30 +202,11 @@ overwriteSelector.onchange = evt => {
     overwrite = evt.target.checked;
 }
 
-function addPopulation() {
-    const pop = initializePopulation(currentSetup);
-    selectors.simulations.appendChild(pop.wrapper)
-    const action = pop.wrapper.querySelector('.sim-control')
-    const delBtn = document.createElement('button')
-    delBtn.className = 'btn btn-small btn-error';
-    delBtn.innerHTML = '<i class="icon icon-shutdown"></i> Remove Simulation'
-    delBtn.style = 'float: right;'
-    delBtn.onclick = () => {
-        const idx = populations.indexOf(pop)
-        populations.splice(idx, 1);
-        selectors.simulations.removeChild(pop.wrapper);
-    }
-    action.appendChild(delBtn)
-    populations.push(pop)
-}
-
-addPopulation();
-
 selectors.addsimulation.onclick = e => addPopulation();
 
-let speed = 1
-let currentIndex = speed;
-let minute = 4 * 60;
+
+// ----- Initialized population and start simulation ----- //
+addPopulation();
 
 window.setInterval(() => {
     currentIndex--;
@@ -185,8 +223,6 @@ window.setInterval(() => {
         time.innerHTML = `<figure class="avatar avatar-sm" style="text-align: center; padding-top: 3px" >${prefix}</figure>Time: ${('' + hour).padStart(2, '0')}:${('' + Math.floor(minute % 60)).padStart(2, '0')}`
     }
 }, 1)
-
-
 
 
 function render() {
