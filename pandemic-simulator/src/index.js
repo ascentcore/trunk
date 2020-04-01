@@ -5,12 +5,14 @@ import './styles/spectre-icons.min.css';
 // Scenario templates
 const templates = [
     { "name": "Default", "value": { ...DEFAULTS } },
-    { "name": "Large Size City", "value": { "name": "Large Size City", "populationSize": 10000, "commercialAreas": 400, "socialAreas": 500 } },
-    { "name": "Medium Size City", "value": { "name": "Medium Size City", "populationSize": 5000, "commercialAreas": 300, "socialAreas": 350 } },
+    { "name": "Large Size City", "value": { "name": "Large Size City", "populationSize": 10000, "commercialAreas": 250, "socialAreas": 300 } },
+    { "name": "Medium Size City", "value": { "name": "Medium Size City", "populationSize": 5000, "commercialAreas": 120, "socialAreas": 150 } },
     { "name": "Small Size City", "value": { "name": "Small Size City", "populationSize": 1000, "commercialAreas": 60, "socialAreas": 80 } },
     { "name": "Work From Home", "value": { "name": "Work From Home", "commercialAreas": 0, "workerPercent": 0 } },
     { "name": "Isolation: Visits Disalowed / Shopping Allowed", "value": { "name": "Visits Disalowed / Shopping Allowed", "visitProbability": 0, "socialProbability": DEFAULTS.socialProbability, "workerPercent": 0 } },
     { "name": "Isolation: Visits Allowed / Shopping Disalowed", "value": { "name": "Visits Allowed / Shopping Disalowed", "visitProbability": DEFAULTS.visitProbability, "socialProbability": 0, "workerPercent": 0 } },
+    { "name": "Medium Size City / Large Office Buildings", "value": { "name": "Medium Size City / Large Office Buildings", "populationSize": 5000, "commercialAreas": 10, "socialAreas": 150, "workerPercent": 0.8 } },
+    { "name": "Medium Size City / Small Office Buildings", "value": { "name": "Medium Size City / Small Office Buildings", "populationSize": 5000, "commercialAreas": 400, "socialAreas": 150, "workerPercent": 0.8 } },
 ]
 
 // Population to simulate
@@ -77,15 +79,18 @@ function appendControls(obj, keys, id, suffix = 'col-6') {
         wrapper.className = 'column ' + suffix;
         wrapper.innerHTML = html;
         selectors[id].appendChild(wrapper);
-        const inputBox = wrapper.querySelector('input')
+        const inputBox = document.querySelector(`#${key}`)
         inputBox.onchange = evt => {
             const { value } = evt.target;
+
             if (typeof (obj[key]) == 'string') {
                 obj[key] = value;
             } else {
                 const numVal = parseFloat(value);
                 obj[key] = numVal;
             }
+
+            console.log(value, obj[key])
         }
     })
 
@@ -105,6 +110,7 @@ appendControls(currentSetup, ['populationSize', 'workerPercent', 'commercialArea
 
 // Simulation controls
 appendControls(currentSetup, ['name'], 'simulation-card', 'col-12');
+
 const html = `<div class="column col-12">
     <div class="form-group">
         <label class="form-label" for="templates">Select from template</label>
@@ -121,8 +127,11 @@ const html = `<div class="column col-12">
     </div>
 </div>`
 
+
 const simulationCard = document.querySelector('#simulation-card');
-simulationCard.innerHTML += html;
+const buf = document.createElement('span')
+buf.innerHTML += html;
+simulationCard.appendChild(buf)
 
 const templateSelector = simulationCard.querySelector('#templates');
 const overwriteSelector = simulationCard.querySelector('#overwrite');
@@ -132,7 +141,7 @@ const overwriteSelector = simulationCard.querySelector('#overwrite');
  * Add population
  */
 function addPopulation() {
-    console.log(JSON.stringify(currentSetup))
+    console.log(currentSetup)
     const pop = initializePopulation(currentSetup);
     selectors.simulations.appendChild(pop.wrapper)
     const action = pop.wrapper.querySelector('.sim-control')
@@ -211,6 +220,8 @@ addPopulation();
 Object.assign(currentSetup, templates[4].value)
 currentSetup.name += ' - Visits/Shopping Allowed';
 addPopulation();
+
+Object.assign(currentSetup, DEFAULTS)
 
 window.setInterval(() => {
     currentIndex--;
