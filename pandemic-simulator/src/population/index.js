@@ -56,7 +56,7 @@ export function initializePopulation(settings) {
     config.mapSize = [lat, lat];
     const { mapSize } = config;
 
-    const resolution = Math.floor(CANVAS_WIDTH / mapSize[0]);   // Canvas cell resolution
+    const resolution = CANVAS_WIDTH / mapSize[0];   // Canvas cell resolution
     const map = {}              // Map dictionary
     const residential = [];     // Housing areas
     const commercial = [];      // Commercial areas

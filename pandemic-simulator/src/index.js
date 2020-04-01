@@ -95,7 +95,7 @@ function appendControls(obj, keys, id, suffix = 'col-6') {
 
 
 // Prepare initial simulatin setup object
-const currentSetup = Object.assign({}, DEFAULTS);
+let currentSetup = Object.assign({}, DEFAULTS);
 
 // Virus Setup Controls
 appendControls(currentSetup, ['startManifest', 'manifestUpTo', 'spreadProbability', 'recoveryTime', 'mortality', 'reinfectProbability'], 'virus-setup');
@@ -132,6 +132,7 @@ const overwriteSelector = simulationCard.querySelector('#overwrite');
  * Add population
  */
 function addPopulation() {
+    console.log(JSON.stringify(currentSetup))
     const pop = initializePopulation(currentSetup);
     selectors.simulations.appendChild(pop.wrapper)
     const action = pop.wrapper.querySelector('.sim-control')
@@ -183,7 +184,6 @@ templateSelector.onchange = evt => {
     const { value } = evt.target;
 
     if (value !== 'Select template') {
-
         if (overwrite) {
             currentSetup = { ...DEFAULTS };
         }
@@ -206,6 +206,10 @@ selectors.addsimulation.onclick = e => addPopulation();
 
 
 // ----- Initialized population and start simulation ----- //
+addPopulation();
+
+Object.assign(currentSetup, templates[4].value)
+currentSetup.name += ' - Visits/Shopping Allowed';
 addPopulation();
 
 window.setInterval(() => {
