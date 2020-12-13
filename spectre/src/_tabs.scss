@@ -10,7 +10,7 @@
   .tab-item {
     margin-top: 0;
 
-    a {
+    .tab-item-content {
       border-bottom: $border-width-lg solid transparent;
       color: inherit;
       display: block;
@@ -19,11 +19,12 @@
       text-decoration: none;
       &:focus,
       &:hover {
+        cursor: pointer;
         color: $link-color;
       }
     }
-    &.active a,
-    a.active {
+    &.active .tab-item-content,
+    .tab-item-content.active {
       border-bottom-color: $primary-color;
       color: $link-color;
     }
@@ -43,7 +44,7 @@
       flex: 1 0 0;
       text-align: center;
 
-      a {
+      .tab-item-content {
         margin: 0;
       }
 

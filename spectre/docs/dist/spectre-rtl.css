@@ -376,7 +376,6 @@ p {
 a,
 ins,
 u {
-  -webkit-text-decoration-skip: ink edges;
   text-decoration-skip: ink edges;
 }
 
@@ -570,7 +569,6 @@ html:lang(ko),
   text-decoration: none;
   transition: background .2s, border .2s, box-shadow .2s, color .2s;
   -webkit-user-select: none;
-  -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   vertical-align: middle;
@@ -2857,7 +2855,7 @@ summary.accordion-header::-webkit-details-marker {
   margin-top: 0;
 }
 
-.tab .tab-item a {
+.tab .tab-item .tab-item-content {
   border-bottom: .05rem solid transparent;
   color: inherit;
   display: block;
@@ -2866,13 +2864,14 @@ summary.accordion-header::-webkit-details-marker {
   text-decoration: none;
 }
 
-.tab .tab-item a:focus,
-.tab .tab-item a:hover {
-  color: #5755d9;
+.tab .tab-item .tab-item-content:focus,
+.tab .tab-item .tab-item-content:hover {
+  color: #5755d9; 
+  cursor: pointer;
 }
 
-.tab .tab-item.active a,
-.tab .tab-item a.active {
+.tab .tab-item.active .tab-item-content,
+.tab .tab-item .tab-item-content.active {
   border-bottom-color: #5755d9;
   color: #5755d9;
 }
@@ -2893,7 +2892,7 @@ summary.accordion-header::-webkit-details-marker {
   text-align: center;
 }
 
-.tab.tab-block .tab-item a {
+.tab.tab-block .tab-item .tab-item-content {
   margin: 0;
 }
 
@@ -4207,7 +4206,6 @@ a.text-error:visited {
   padding: .3rem .45rem;
   position: absolute;
   -webkit-user-select: none;
-  -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
 }
