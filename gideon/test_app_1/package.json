@@ -40,7 +40,7 @@
     "@tsed/swagger": "^5.0.7",
     "@tsed/typeorm": "^5.0.7",
     "ajv": "^6.6.2",
-    "bcrypt": "^3.0.3",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.18.3",
     "compression": "^1.7.3",
     "cookie-parser": "^1.4.3",
