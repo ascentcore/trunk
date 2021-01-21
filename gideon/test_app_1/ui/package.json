@@ -12,7 +12,7 @@
         "axios": "^0.19.1",
         "classnames": "^2.2.6",
         "husky": "^4.2.0",
-        "immer": "^5.1.0",
+        "immer": "^8.0.1",
         "lint-staged": "^10.0.2",
         "lodash": "^4.17.15",
         "prettier": "^1.19.1",
