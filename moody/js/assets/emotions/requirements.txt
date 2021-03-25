@@ -9,7 +9,7 @@ Keras==2.1.4
 Markdown==2.6.11
 numpy==1.14.1
 protobuf==3.6.0
-PyYAML==3.13
+PyYAML==5.4
 scipy==1.1.0
 six==1.11.0
 tensorboard==1.8.0
