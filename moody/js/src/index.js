@@ -4,30 +4,24 @@ require('babel-polyfill');
 //Load inputs layer
 import getInputData from './input';
 
-//Load porcessors
+//Load processors
 import getProcessedData from './processors';
+import brainMain from './brain';
 
-import bainMain from './brain';
-
-
-const loopInterval = 5000;
+// Miliseconds to register one frame
+const loopInterval = 1000;
 
 //Main loop
 async function mainLoop() {
-  // window.requestAnimationFrame(async () => {
-  //   const inputData = await getInputData();
-  //   const processedData = await getProcessedData(inputData);
-
-  //   bainMain(processedData);
-  // });
+  window.requestAnimationFrame(async () => {
+    const inputData = await getInputData();
+    const processedData = await getProcessedData(inputData);
+    brainMain(processedData);
+  });
 }
 
-
-// Start our main loop with an initial iteration executed
+// Start the main loop with an initial iteration executed
 mainLoop();
 setInterval(async () => {
   mainLoop();
 }, loopInterval);
-
-
-
