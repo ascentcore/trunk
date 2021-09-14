@@ -1,17 +1,19 @@
 import getFaces from './facedetection';
-import getEmotions from './emotions';
 import posenet from './positionResNet';
 import stance from './stance';
+import { setData } from '../../train/setData';
 
-export default async inputData => {
-const data = inputData;
- 
- // Object.assign(data, await getFaces(inputData));
- // Object.assign(data, await getEmotions(data));
- // Object.assign(data, await posenet(data));
- // Object.assign(data, await stance(data));
- 
-  console.log(data);
+export default async (inputData) => {
+  const data = inputData;
+
+  // Experimental Google Chrome Face Detection API
+  Object.assign(data, await getFaces(inputData));
+
+  // poseNet
+  Object.assign(data, await posenet(data));
+
+  // stanceDetector
+  Object.assign(data, await stance(data));
 
   return data;
-}
+};

@@ -4,12 +4,25 @@ import {
 } from '../constants';
 import moody from '../output/moody';
 
-const char = moody('#vis');
-const { opts, lookAt } = char;
-
 function main(input) {
   const { faces } = input;
-  console.log(input);
+  let stanceClass = null;
+  if (input.people) {
+    input.people.forEach((element) => {
+      console.log(element);
+      if (element) {
+        stanceClass = element.stance.stanceClass;
+        console.log('Stance: ', element.stance.stanceClass);
+        console.log('Position: ', element.position);
+        console.log('Face: ', element.face);
+      } else {
+        console.log('No input');
+      }
+    });
+  }
+
+  const char = moody('#vis', stanceClass);
+
   if (faces && faces.length > 0) {
     const {
       boundingBox: { x, y },
